@@ -1,0 +1,139 @@
+# 能力清单（安全声明）—— inference-tuning
+#
+# 语义：本清单是**白名单**。未声明的 capability 与未列出的 resource 一律拒绝
+# （E_CAPABILITY_DENIED / E_RESOURCE_NOT_DECLARED，见 src/capability.mjs）。
+#
+# 风险档沿用 inference-serving 已固化的定义：
+#   read   = R0 只读，无沙箱要求
+#   write  = R1/R2 写操作，需沙箱（本机 R1 不可用 → 实际按 R2 容器级执行）
+#   system = R4 系统级，需 VM 级沙箱 —— 本机无 VM 沙箱，故一律拒绝
+
+name: inference-tuning
+version: 0.1.0
+interface:
+  mcp: "1.0.0"
+  cli: "1.0.0"
+
+capabilities:
+  - id: analyze
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: []
+  - id: tune
+    risk: write
+    sandbox: container
+    idempotent: false
+    resources: [gpu:write, port:bind, disk:write, state:write, model:read]
+  - id: validate
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [gpu:write, port:bind, model:read]
+  - id: rollback
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [gpu:write, port:bind, state:write]
+  - id: get_report
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: [state:read]
+  - id: list
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: [state:read]
+  - id: health
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: []
+  - id: metrics
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: [state:read]
+  - id: audit_verify
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: [state:read]
+  - id: contract
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: []
+  - id: capabilities
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: []
+  - id: install_skills
+    risk: write
+    sandbox: none
+    idempotent: true
+    resources: [disk:write]
+
+not_provided:
+  - id: quantize
+    reason: 不做量化 —— 那是 inference-quantization 的职责；本包只通过 MCP 请求它
+  - id: quant_format_change
+    reason: 硬排除：不改变主模型既有的量化格式（含 linear_attn FP8→NVFP4 这类"改格式优化"）
+  - id: operator_patch
+    reason: 本轮不纳入算子级改动（属 R3，本机 VM 沙箱不可用；需显式授权才可开启）
+  - id: deploy_generic
+    reason: 不自己做通用部署 —— 端点生命周期一律交给 inference-serving
+  - id: touch_existing_endpoints
+    reason: 只操作本次运行经 serving 建出来的端点；存量端点一律只读
+  - id: wiki
+    reason: 不含 Wiki 读写（Step 0 裁决 Q2：移出核心）
+  - id: field_mode
+    reason: 不含现场模式（Step 0 裁决 Q1：整体舍弃）
+  - id: training
+    reason: 不做训练 / QAT —— 那是训练侧的职责
+  - id: orchestration
+    reason: 不做推理编排（留待训练侧就位后的 RSI 阶段）
+  # ── 2026-09-28 能力对照（vs dsh-tuning-engine）后补声明 ──────────────────
+  # 这些能力**本包没有**，此前**未声明** —— 对照表发现后补上。
+  # 补声明的原因：'主动不做' 与 '忘了做' 必须能区分；否则下架旧引擎就是静默丢失。
+  # 依据：inference-integration/DSH_TUNING_ENGINE_CAPABILITY_MAP.md §2
+  - id: operator_profiling
+    reason: 不做算子级 profiling（原 dsh-tuning-engine 的 tuner_profile_operators）。
+      本包源码内检索 sglang_layers / torch_trace / profileOperators 均无命中；
+      与已声明的 operator_patch（**改**算子）不是一回事 —— 这是**测**算子。
+  - id: sla_tiering
+    reason: 无 SLA/goodput 分级判定（原 sla.goodputAnalysis / sla.judgeTier / sla.tierFeasibility）。
+      goodput 仅作为词出现在 validity/performance.mjs，未构成一套分级判定。
+  - id: gate_registry
+    reason: 无闸门注册表（原 gates.gatePlan / gates.listGates）。
+  - id: optimization_space
+    reason: 无优化空间分析（原 space.prefillInterference / space.tierOptimizationSpace）。
+      prefillInterference 在本包只作为**观测名**出现在 walls/remedies.mjs，不是分析能力。
+  - id: memory_headroom_gate
+    reason: 无独立的内存余量闸门（原 headroom.gateMemoryHeadroom）。
+      headroom 概念在 loop/early-stop.mjs 与 loop/objective.mjs 中被使用，但没有这个独立判定。
+  - id: bottleneck_gate
+    reason: 无独立瓶颈闸门（原 objective.gateBottleneck）。
+      本包有 objective.decideRunOutcome / assessTargets。
+  - id: env_discovery
+    reason: 无环境发现（原 env.discoverEnvironment）。
+
+dependencies:
+  - name: inference-serving
+    via: mcp
+    purpose: 端点生命周期（deploy / teardown / rollback / reconcile）与健康检查
+    required: true
+  - name: inference-quantization
+    via: mcp
+    purpose: 需要量化时由本包提示并转交；本包不做量化
+    required: false
+  - name: "@ai-infra/testing-core"
+    via: internal-transition
+    purpose: 精度回归契约的宿主（**该库在本机不存在** → 包内 @internal 实现 + CI 契约一致性检查）
+    required: false
+
+host:
+  node: ">=20.11.0"
+  runtimeDependencies: 0
