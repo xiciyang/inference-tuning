@@ -1,6 +1,0 @@
-{
-  "serving": 0,
-  "quantization": 0,
-  "managedNames": [],
-  "total": 0
-}

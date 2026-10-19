@@ -1,4 +1,4 @@
-# Bundle patch for inference-tuning.
+# Bundle patch for @xiciyang/inference-tuning.
 # 把插件入口加入 host 组合。
 #
 # 重要：name 必须是 npm 包名（经 profile 的 node_modules 解析），不能写相对路径。
@@ -8,10 +8,10 @@
 # 本包只硬依赖 tools；webServer 是**可选**的（用 ctx.get('webServer') 取，取不到就不注册路由），
 # 因此不写进 inject —— 写进去会让插件在没挂 webServer 的环境里一直 wait。
 #
-# 入口 id 用 inference-tuning，与已存在的 dsh-tuning-engine（entry id: tuner）区分开：
+# 入口 id 用 @xiciyang/inference-tuning，与已存在的 dsh-tuning-engine（entry id: tuner）区分开：
 # 两者**同时挂载**，各自注册自己的工具命名空间（inference_tuning_* / tuner_*）。
 - insert:
-    - id: inference-tuning
-      name: 'inference-tuning'
+    - id: @xiciyang/inference-tuning
+      name: '@xiciyang/inference-tuning'
       inject:
         - tools

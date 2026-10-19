@@ -135,7 +135,9 @@ export function paramCatalog() {
 }
 
 /** 参数键 → 原始 flag（不带值），用于探测存在性。 */
-export function flagNameFor(paramId, engineId = 'vllm') {
+export function flagNameFor(paramId, engineId = null) {
+  // 不猜引擎：未知/未指定引擎一律返回 null，由调用方显式失败或跳过。
+  if (!engineId) return null
   const flags = PARAM_CATALOG[paramId]?.flags?.[engineId]
   return flags && flags.length ? flags[0] : null
 }
@@ -211,8 +213,16 @@ export function proposeCandidate({ base = {}, lever, direction = 'increase', ste
  * 把参数集渲染成引擎命令行（值 → flag）。
  * 只渲染**已确认存在**的 flag；缺失/未确认的一律跳过并记入 `skipped`（不猜）。
  */
-export function buildLaunchArgs(params = {}, { engineId = 'vllm', supportedFlags = null } = {}) {
+export function buildLaunchArgs(params = {}, { engineId = null, supportedFlags = null } = {}) {
   assertNoForbiddenParams(params)
+  // 软硬件解耦：核心不默认到任何引擎。没有引擎就无法把语义参数映射成命令行，
+  // 这时**显式失败**，而不是悄悄按某个厂商的 flag 表下发。
+  if (Object.keys(params).length > 0 && !engineId) {
+    fail(ERROR_CODES.E_ENGINE_NOT_SPECIFIED,
+      '未指定推理引擎：参数无法映射成命令行（本模块不默认到 vllm/sglang 等任何实现）',
+      { remediation: '在 run spec 里显式给 engine.id（或在 profile 配置 engineId），再重跑。',
+        details: { params: Object.keys(params) } })
+  }
   const args = []
   const skipped = []
   const applied = {}

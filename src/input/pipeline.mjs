@@ -94,7 +94,7 @@ export async function runInputPipeline(runtime, raw = {}) {
 
   const params = { ...(raw.params ?? {}) }
   const engine = {
-    id: raw.engine ?? runtime.options.engineId ?? 'vllm',
+    id: raw.engine ?? runtime.options.engineId ?? null,
     image: raw.engineImage ?? runtime.options.engineImage ?? null,
     servedModelName: raw.servedModelName ?? `tuning-${model.path.split('/').filter(Boolean).pop()}`.slice(0, 60),
   }
@@ -102,7 +102,7 @@ export async function runInputPipeline(runtime, raw = {}) {
   const requests = Number.isFinite(Number(raw.requests)) ? Number(raw.requests) : runtime.options.requests
   const concurrency = Number.isFinite(Number(raw.concurrency)) ? Number(raw.concurrency) : runtime.options.concurrency
 
-  assumptions.push({ field: 'engineId', value: engine.id, reason: raw.engine ? '调用方指定' : '默认（本机实测可用）' })
+  assumptions.push({ field: 'engineId', value: engine.id, reason: raw.engine ? '调用方指定' : (engine.id ? '来自 profile 配置' : '未指定 —— 执行前必须显式确定（不默认到任何厂商实现）') })
   assumptions.push({ field: 'workload', value: workload, reason: raw.workload ? '调用方指定' : '默认负载形状' })
   assumptions.push({ field: 'requests', value: requests, reason: raw.requests ? '调用方指定' : '默认样本数（满足统计出处闸的最低样本量）' })
 

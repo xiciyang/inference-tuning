@@ -12,6 +12,7 @@ import {
   buildLaunchArgs, parseSupportedFlags, snapToAlign, flagNameFor, leverToParams, selectableLevers,
   FORBIDDEN_PARAM_PATTERNS,
 } from '../../src/registry.mjs'
+import { resolveGpuSpec } from '../../src/platform/gpuspec.mjs'
 
 test('硬排除: 量化/精度类参数一律拒绝（不是优先级）', () => {
   const cases = [
@@ -108,7 +109,7 @@ test('对齐与夹取: snapToAlign / clampParam', () => {
 
 test('渲染: 只下发**已探测存在**的 flag，缺的一律跳过并记账（不猜）', () => {
   const supported = new Set(['--max-num-seqs', '--gpu-memory-utilization'])
-  const r = buildLaunchArgs({ concurrency_capacity: 64, kv_pool_size: 0.9, batch_step_count: 4 }, { supportedFlags: supported })
+  const r = buildLaunchArgs({ concurrency_capacity: 64, kv_pool_size: 0.9, batch_step_count: 4 }, { engineId: 'vllm', supportedFlags: supported })
   assert.deepEqual(r.args, ['--max-num-seqs', '64', '--gpu-memory-utilization', '0.9'])
   assert.equal(r.skipped.length, 1)
   assert.equal(r.skipped[0].paramId, 'batch_step_count')
@@ -121,6 +122,24 @@ test('渲染: flag 探测 —— vLLM 0.23.1rc1 删掉的两个 flag 必须能�
   assert.ok(set.has('--max-num-seqs'))
   assert.ok(!set.has('--swap-space'), '已删除的 flag 不应出现在集合里')
   assert.ok(!set.has('--disable-log-requests'))
+})
+
+test('解耦: 未指定引擎 → 显式失败，绝不默认到某个厂商的 flag 表', () => {
+  assert.throws(() => buildLaunchArgs({ concurrency_capacity: 64 }), (e) => e.code === 'E_ENGINE_NOT_SPECIFIED')
+})
+
+test('解耦: 未登记的引擎 → 参数全部跳过并记账（不会借用 vllm 的 flag）', () => {
+  const r = buildLaunchArgs({ concurrency_capacity: 64 }, { engineId: 'some-new-engine' })
+  assert.deepEqual(r.args, [])
+  assert.equal(r.skipped.length, 1)
+  assert.match(r.skipped[0].reason, /无对应 flag/)
+})
+
+test('解耦: 未登记的硬件 → 没有实测值就判不可用，不回落到规格书', () => {
+  const r = resolveGpuSpec({ deviceName: 'SomeUnlistedAccelerator' })
+  assert.equal(r.usable, false)
+  assert.equal(r.spec, null)
+  assert.equal(r.hintFromSpecSheet, null)
 })
 
 test('渲染: 空 help（探测失败）→ 集合为空，调用方会据此跳过全部参数而不是硬发', () => {

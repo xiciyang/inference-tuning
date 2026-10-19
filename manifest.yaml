@@ -1,4 +1,4 @@
-# 能力清单（安全声明）—— inference-tuning
+# 能力清单（安全声明）—— @xiciyang/inference-tuning
 #
 # 语义：本清单是**白名单**。未声明的 capability 与未列出的 resource 一律拒绝
 # （E_CAPABILITY_DENIED / E_RESOURCE_NOT_DECLARED，见 src/capability.mjs）。
@@ -8,7 +8,7 @@
 #   write  = R1/R2 写操作，需沙箱（本机 R1 不可用 → 实际按 R2 容器级执行）
 #   system = R4 系统级，需 VM 级沙箱 —— 本机无 VM 沙箱，故一律拒绝
 
-name: inference-tuning
+name: "@xiciyang/inference-tuning"
 version: 0.1.0
 interface:
   mcp: "1.0.0"

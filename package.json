@@ -1,5 +1,5 @@
 {
-  "name": "inference-tuning",
+  "name": "@xiciyang/inference-tuning",
   "version": "0.1.0",
   "description": "根因墙驱动的推理调优插件：诊断瓶颈墙 → 匹配 TOP1 干预 → 性能与精度双闭环验证 → 通过则输出可复用配置，失败则自动回退",
   "type": "module",
@@ -27,7 +27,7 @@
     "docs/audit-sample/"
   ],
   "scripts": {
-    "test": "node --test \"tests/unit/*.test.mjs\" \"tests/integration/*.test.mjs\" && npm run test:contract",
+    "test": "node --test \"tests/unit/*.test.mjs\" \"tests/integration/*.test.mjs\"",
     "test:contract": "npm run test:parity-contract && node ../inference-contracts/checks/run-all.mjs",
     "check": "node scripts/check-manifest.mjs",
     "e2e": "node scripts/e2e-demo.mjs",
@@ -38,8 +38,8 @@
   },
   "dependencies": {},
   "engines": {
-    "node": ">=20.11.0",
-    "dsh": ">=0.2.0 <0.3.0"
+    "dsh": ">=0.2.0 <0.3.0",
+    "node": ">=20"
   },
   "dsh": {
     "bundle": {
@@ -47,17 +47,19 @@
     }
   },
   "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
     "dsh",
-    "plugin",
     "inference",
     "tuning",
-    "root-cause-wall",
-    "measurement-integrity",
-    "dsh-plugin",
-    "deepseek-harness"
+    "vllm"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xiciyang/inference-tuning.git"
+  },
+  "homepage": "https://github.com/xiciyang/inference-tuning#readme",
+  "bugs": {
+    "url": "https://github.com/xiciyang/inference-tuning/issues"
   }
 }

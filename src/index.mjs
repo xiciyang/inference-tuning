@@ -18,7 +18,7 @@ import {
   auditVerifyOperation, contractOperation, capabilitiesOperation,
 } from './api.mjs'
 
-export const name = 'inference-tuning'
+export const name = '@xiciyang/inference-tuning'
 export const inject = ['tools']
 
 /** 与 MCP 工具同名同义 —— 一套语义，多入口。 */
@@ -80,10 +80,10 @@ export async function apply(ctx, config = {}) {
    * 本包此前 12 个工具**全都没有**声明 `output`。后果不是"少个字段"，
    * 而是 DSH 的 loader **直接拒绝整个 entry**：
    *
-   *   ERROR: loader.create 失败: failed to apply loader entry … (inference-tuning):
+   *   ERROR: loader.create 失败: failed to apply loader entry … (@xiciyang/inference-tuning):
    *     tool "inference_tuning_analyze" must declare output { schema, render, presentationMeta? }
    *
-   * 也就是说 —— **inference-tuning 根本无法挂进 DSH**。
+   * 也就是说 —— **@xiciyang/inference-tuning 根本无法挂进 DSH**。
    * 而这一点在单包测试（`npm test`）、集成测试（走 api.mjs 与 CLI）里**都看不见**，
    * 因为那两条路径都不经 `ctx.tools.register`。只有真的往 DSH 里装载才会暴露。
    *
@@ -99,7 +99,7 @@ export async function apply(ctx, config = {}) {
   }
   const registerTool = (tool) => {
     const normalized = { ...tool, output: tool.output ?? DSH_OUTPUT, execute: async (a, e) => toLosslessJson(await tool.execute(a, e)) }
-    ctx.effect(() => ctx.tools.register(normalized), `inference-tuning: register ${normalized.name}`)
+    ctx.effect(() => ctx.tools.register(normalized), `@xiciyang/inference-tuning: register ${normalized.name}`)
   }
 
   registerTool({
@@ -218,7 +218,7 @@ export async function apply(ctx, config = {}) {
           res.statusCode = 200
           res.setHeader('content-type', 'application/json')
           res.end(JSON.stringify({
-            ok: true, service: 'inferenceTuning', origin: 'inference-tuning', version: '0.1.0',
+            ok: true, service: 'inferenceTuning', origin: '@xiciyang/inference-tuning', version: '0.1.0',
             sandbox: { process: out.sandbox.process, container: out.sandbox.container, vm: out.sandbox.vm },
             servingReachable: out.serving.reachable,
             auditOk: out.audit.ok,
@@ -230,7 +230,7 @@ export async function apply(ctx, config = {}) {
           res.end(JSON.stringify(toErrorPayload(err)))
         }
       },
-    }), 'inference-tuning: register /__inference_tuning/health')
+    }), '@xiciyang/inference-tuning: register /__inference_tuning/health')
   }
 }
 

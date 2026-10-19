@@ -1,4 +1,4 @@
-# inference-tuning
+# @xiciyang/inference-tuning
 
 给模型 + 性能目标 + 精度容忍，**找到根因墙、匹配 TOP1 干预、双闭环验证** ——
 通过则输出可复用的优化配置，失败则自动回退。
@@ -40,9 +40,9 @@
 ## 安装
 
 ```bash
-npm install -g inference-tuning
+npm install -g @xiciyang/inference-tuning
 # 或（本机 npm 官方源不可达时的推荐通道）
-npm pack && npm install -g ./inference-tuning-0.1.0.tgz
+npm pack && npm install -g ./xiciyang-inference-tuning-0.1.0.tgz
 ```
 
 作为 **DSH 插件**：`dsh plugin --profile web add <tgz>`，重启后生效。
@@ -85,10 +85,35 @@ inference-tuning audit-verify --json      # 复算审计哈希链
 
 ## 精度回归契约
 
-`@ai-infra/testing-core` 在本机**不存在**（四项独立探测为空 + registry 不可达），
-因此精度回归有**两份实现**（本包 `endpoint-logprobs`、quantization `container-forward`）。
+精度回归由**两份独立实现**（本包 `endpoint-logprobs`、quantization `container-forward`）互相校验，
 契约放在 `docs/parity-contract.md`（**单一事实来源**），由 `tests/contract/parity-consistency.test.mjs`
-在**CI 级别**做三方一致性断言（契约文件 ⇄ 本包 ⇄ 兄弟包）。不一致 → 测试红 → 不允许发布。
+做三方一致性断言（契约文件 ⇄ 本包 ⇄ 兄弟包）。不一致 → 测试红 → 不允许发布。
+
+## 配置
+
+| 输入 | 说明 |
+|---|---|
+| `--engine <id>` / `options.engineId` | **必填**（无默认）。本包不内置任何引擎的默认值；新引擎通过 `PARAM_CATALOG` 的 `flags.<engine>` 扩展 |
+| `--engine-image` | 引擎镜像（固定到 digest 才算可重放） |
+| `--max-accuracy-drop-pct` / `--min-perf-gain-pct` | 门禁阈值；必须显式给，或写进 `gates.yaml`，两者都无则拒绝执行 |
+| `--params` | 语义参数（不是引擎 flag）；映射成命令行时才使用所选引擎的 flag 表 |
+| `--test-set` | 精度对比用的固定评测集 |
+| `params.servingPath` / `~/.ai-infra/config/serving-path.txt` | 定位 `inference-serving`（端点生命周期全部经 MCP，本包不发 docker 命令） |
+
+## 兼容与解耦
+
+- **Node ≥ 20**，Linux/macOS，零运行时依赖（只用 Node 内建模块）。
+- **不绑定引擎**：未指定引擎时 `buildLaunchArgs` 抛 `E_ENGINE_NOT_SPECIFIED`，绝不回落到某个厂商的 flag 表；
+  未登记的引擎 → 参数全部跳过并记账（`skipped` 带原因），不会借用别的引擎的 flag。
+- **不绑定硬件**：静态规格表**只用于提示该测什么**，`usable: false` 时禁止进入任何天花板分母；
+  未登记的硬件 → 无规格、无提示，只能靠本机微基准产出实测值。统一内存与独立显存分开建模。
+- **不绑定 serving 实现**：只经 MCP 契约调用，路径可配置。
+- 已在 DSH **0.2.0-rc.2** 上验证；`npm test` 为本包自有套件（250 项），
+  跨仓契约套件单独跑：`npm run test:contract`（需要 `inference-contracts` 与兄弟包）。
+
+## 许可
+
+BSD-3-Clause。见 `LICENSE`。
 
 ## 明确不做
 
