@@ -38,7 +38,8 @@
   },
   "dependencies": {},
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=20.11.0",
+    "dsh": ">=0.2.0 <0.3.0"
   },
   "dsh": {
     "bundle": {
@@ -51,6 +52,12 @@
     "inference",
     "tuning",
     "root-cause-wall",
-    "measurement-integrity"
-  ]
+    "measurement-integrity",
+    "dsh-plugin",
+    "deepseek-harness"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiciyang/inference-tuning.git"
+  }
 }

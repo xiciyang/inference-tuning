@@ -68,9 +68,9 @@
 ```
 实测调用 tuner_analyze({op:'list'}) → ok=true，返回 47 个 op
 挂载位置：~/.dsh/profiles/web/package.json
-         dependencies."dsh-tuning-engine": "link:/home/xiciyang/deepseek_harness/dsh-tuning-engine"
+         dependencies."dsh-tuning-engine": "link:$HOME/deepseek_harness/dsh-tuning-engine"
          bundles: [ ... "dsh-tuning-engine" ... ]
-         node_modules/dsh-tuning-engine -> /home/xiciyang/deepseek_harness/dsh-tuning-engine
+         node_modules/dsh-tuning-engine -> $HOME/deepseek_harness/dsh-tuning-engine
 ```
 
 **这是本阶段最需要你知道的一条工程事实**：

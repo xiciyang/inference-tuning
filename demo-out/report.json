@@ -579,7 +579,7 @@
           "contractSource": "docs/parity-contract.md",
           "implementation": "inference-tuning/internal",
           "source": "endpoint-logprobs",
-          "testSetPath": "/home/xiciyang/.ai-infra/state/datasets/Salesforce-wikitext__wikitext-2-raw-v1__train__s20260923__c512/test.jsonl",
+          "testSetPath": "$HOME/.ai-infra/state/datasets/Salesforce-wikitext__wikitext-2-raw-v1__train__s20260923__c512/test.jsonl",
           "round": 1
         }
       },
@@ -670,7 +670,7 @@
       "requests": 8,
       "concurrency": 2,
       "testSet": {
-        "path": "/home/xiciyang/.ai-infra/state/datasets/Salesforce-wikitext__wikitext-2-raw-v1__train__s20260923__c512/test.jsonl",
+        "path": "$HOME/.ai-infra/state/datasets/Salesforce-wikitext__wikitext-2-raw-v1__train__s20260923__c512/test.jsonl",
         "digest": null
       },
       "metadata": {
@@ -776,5 +776,5 @@
       }
     }
   ],
-  "reportPath": "/home/xiciyang/.ai-infra/reports/inference-tuning/tr_8f56efd9cb66.json"
+  "reportPath": "$HOME/.ai-infra/reports/inference-tuning/tr_8f56efd9cb66.json"
 }
