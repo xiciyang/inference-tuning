@@ -36,7 +36,7 @@ async function setup({ thresholds = { max_accuracy_drop_pct: 30, min_perf_gain_p
       executor: 'fake',
       // 测试里把稳态窗口压到 300ms（生产默认 60s）—— 它是**闸门**，不能在测试里被设成 0
       steadyStateWaitMs: 300,
-      requests: 8,   // paired-median-delta 的最低样本量是 6 —— 夹具不得低于被测闸的门槛
+      requests: 24,  // 最低样本量是 6；8 在负载下会被噪声打穿，24 才能稳定通过统计出处闸
       concurrency: 2,
       maxRounds: 4,
     },
