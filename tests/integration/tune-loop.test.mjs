@@ -245,8 +245,11 @@ test('闭环: 端点返回常量 logprob → 测量不成立 → 本轮被拒且
 
 test('闭环: 精度退化超阈值 → 回退（丢弃候选，保留原配置）', async () => {
   const { sb, runtime, testSetPath } = await setup({
+    // 步长必须"足以跨过阈值、又不至于把输出打成常量"：
+    //   0.8 会让 mock 输出退化成常量 logprob ⇒ 先命中**测量不成立**分支（另一条用例覆盖），
+    //   实测在 CI/负载下不稳定；0.5 稳定走"可测量退化 → 拒绝并回退"这条路径。
     thresholds: { max_accuracy_drop_pct: 0.001, min_perf_gain_pct: 1 },
-    knobsPatch: { accuracyDropPerStep: 0.8 },
+    knobsPatch: { accuracyDropPerStep: 0.5 },
   })
   try {
     const out = await tuneWithConfirm(runtime, rawFor(sb, testSetPath))
