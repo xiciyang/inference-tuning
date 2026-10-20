@@ -32,7 +32,7 @@
 
 ```bash
 node scripts/e2e-demo.mjs \
-  --model /data/models/Qwen2.5-1.5B-Instruct-verified \
+  --model /path/to/models/<model> \
   --test-set ~/.ai-infra/state/datasets/Salesforce-wikitext__wikitext-2-raw-v1__train__s20260923__c512/test.jsonl \
   --accuracy-drop 8 --perf-gain 3 --requests 8 --max-rounds 2 \
   --machine-name "NVIDIA GB10" --out ./demo-out
@@ -130,7 +130,7 @@ unknown-walls     4 堵墙因缺观测不可判定（speculative, compute, memor
 链复算：ok，3 条记录，每条 prevHash 指向上一条的 hash
 最后一条：
   {"capability":"tune","action":"tune","phase":"end","runId":"tr_8f56efd9cb66",
-   "model":"/data/models/Qwen2.5-1.5B-Instruct-verified","outcome":"no-improvement",
+   "model":"/path/to/models/<model>","outcome":"no-improvement",
    "rounds":1,"acceptedRounds":0,"rootWall":"bandwidth","confirmed":true,
    "rollbackFailed":false,"reportPath":"..."}
 

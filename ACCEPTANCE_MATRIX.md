@@ -54,7 +54,7 @@ outcome = no-improvement     耗时 496 s
 
 | # | 要求 | 证据 | 判定 |
 |---|---|---|---|
-| **B1** | 绝对路径模型 | `D` 真机 `/data/models/Qwen2.5-1.5B-Instruct-verified` | ✅ |
+| **B1** | 绝对路径模型 | `D` 真机 `/path/to/models/<model>` | ✅ |
 | **B2** | 相对路径 / modelRoots 下的名字 | `T` `input/pipeline.mjs`：裸名字在 modelRoots 下解析；相对路径按 cwd 解析 | ✅ |
 | **B3** | 符号链接（跟随并**留痕**） | `T` 跟随软链并推 `W_SYMLINK_MODEL_ROOT` 警告（记录真实路径），避免事后不知道测的是哪份权重 | ✅ |
 | **B4** | 模型不存在 → 明确报错并列出试过的路径 | `T` `E_MODEL_UNRESOLVED` 带 `tried` 列表 | ✅ |

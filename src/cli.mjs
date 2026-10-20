@@ -55,7 +55,7 @@ const HELP = `inference-tuning —— 根因墙驱动的推理调优：诊断瓶
 示例
   inference-tuning analyze --json
   inference-tuning health --json
-  inference-tuning tune /data/models/Qwen2.5-1.5B-Instruct-verified \\
+  inference-tuning tune /path/to/models/<model> \\
       --max-accuracy-drop-pct 5 --min-perf-gain-pct 20 \\
       --params '{"max_num_seqs":32}' --test-set ~/.ai-infra/state/datasets/.../test.jsonl
 `

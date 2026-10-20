@@ -12,7 +12,7 @@
  *   · 沙箱容器级可用（docker + nvidia runtime）
  *
  * 用法：
- *   node scripts/e2e-demo.mjs --model /data/models/Qwen2.5-1.5B-Instruct-verified \
+ *   node scripts/e2e-demo.mjs --model /path/to/models/<model> \
  *       --test-set ~/.ai-infra/state/datasets/.../test.jsonl \
  *       --accuracy-drop 5 --perf-gain 5 --out ./demo-out
  *

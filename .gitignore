@@ -17,3 +17,7 @@ __pycache__/
 venv/
 
 demo-out/*.log
+
+# 本地运行产物（含真实主机路径与模型清单），不入库
+demo-out/
+out/

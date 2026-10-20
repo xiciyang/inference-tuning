@@ -88,7 +88,7 @@ export function defaultOptions() {
     budgetMs: 6 * 3600 * 1000,
     acceptMinGainPct: null,        // 由门禁阈值决定，不在这里
     // --- 路径 ---
-    modelRoots: ['/data/models'],
+    modelRoots: (process.env.DSH_MODEL_ROOTS || '/data/models').split(':').filter(Boolean),
   }
 }
 

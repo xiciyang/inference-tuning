@@ -63,7 +63,7 @@ inference-tuning analyze --json           # 【只读】墙诊断（零风险，
 inference-tuning capabilities             # 能力清单与"明确不做"的事
 inference-tuning contract                 # 精度回归契约声明
 
-inference-tuning tune /data/models/Qwen2.5-1.5B-Instruct-verified \
+inference-tuning tune /path/to/models/<model> \
     --max-accuracy-drop-pct 5 --min-perf-gain-pct 20 \
     --test-set ~/.ai-infra/state/datasets/.../test.jsonl \
     --params '{"concurrency_capacity":32}'
