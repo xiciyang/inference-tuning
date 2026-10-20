@@ -263,7 +263,11 @@ test('闭环: 精度退化超阈值 → 回退（丢弃候选，保留原配置�
     const out = await tuneWithConfirm(runtime, rawFor(sb, testSetPath))
     assert.equal(out.report.acceptedRounds, 0)
     assert.equal(out.signed, false)
-    const rejected = out.report.rounds.filter((r) => r.decision === 'rejected-rolled-back')
+    // 两条合法的拒绝路径：精度确实退化（rejected-rolled-back）或**测量不成立**
+    // （rejected-invalid-measurement —— 退化到常量 logprob 时守卫先命中）。
+    // 二者都必须"丢弃候选、保留原配置"，这才是本用例要守的东西；
+    // 哪一条先触发取决于假执行器的吞吐抖动（CI 负载下不稳定），因此按**拒绝族**断言。
+    const rejected = out.report.rounds.filter((r) => String(r.decision).startsWith('rejected-'))
     assert.ok(rejected.length >= 1, JSON.stringify(out.report.rounds.map((r) => r.decision)))
     // 回退后端点仍被拆干净
     assert.equal(knobs.servers.size, 0)
