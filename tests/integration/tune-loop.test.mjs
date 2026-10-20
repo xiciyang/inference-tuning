@@ -142,8 +142,16 @@ test('闭环: 注册表五要素齐全，报告落盘，审计链完好', async 
     assert.ok(records.length >= 1)
     assert.equal(records.at(-1).capability, 'tune')
 
+    // 本用例验的是**记账一致性**（注册表/报告/审计/指标），不是统计判定的方向：
+    // 假执行器的吞吐在负载高的 runner 上会抖动，判定可能 improved 也可能 not_improved。
+    // 因此断言"恰好记一次结局"，并断言它**与报告结论一致**，而不是钉死 improved。
     const m = await readMetrics(runtime)
-    assert.equal(m.counters.tune_improved, 1)
+    const improved = m.counters.tune_improved ?? 0
+    const notImproved = m.counters.tune_not_improved ?? 0
+    assert.equal(improved + notImproved, 1,
+      `必须恰好记一次结局计数（improved=${improved} / not_improved=${notImproved}）`)
+    assert.equal(out.report.outcome === 'improved' ? improved : notImproved, 1,
+      `结局计数必须与报告结论 ${out.report.outcome} 一致`)
   } finally { await sb.cleanup() }
 })
 
